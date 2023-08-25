@@ -208,10 +208,11 @@ impl X86Instruction {
 
 const SINGLE: &str = "data/listing_0037_single_register_mov";
 const MANY: &str = "data/listing_0038_many_register_mov";
-const SINGLE_ASM: &str = "data/listing_0037_single_register_mov.asm";
-const MANY_ASM: &str = "data/listing_0038_many_register_mov.asm";
 
 fn main() -> io::Result<()> {
+    let listing = fun_name(SINGLE)?;
+    println!("{}", listing);
+    println!();
     let listing = fun_name(MANY)?;
     println!("{}", listing);
     Ok(())
@@ -221,21 +222,20 @@ fn fun_name(binary: &str) -> Result<String, io::Error> {
     let path = Path::new(binary);
     let mut file = File::open(path)?;
     let mut buffer = [0; 2];
-    let mut listing = Vec::new();
-    listing.push("bits 16".to_string());
+    let mut listing = String::new();
+    listing.push_str("bits 16\n");
+
     while file.read(&mut buffer)? > 0 {
         let value = u16::from_be_bytes(buffer);
         let instruction = X86Instruction::from_u16(value);
-
         match instruction.format_instruction() {
             Ok(formatted_instruction) => {
-                listing.push(formatted_instruction);
-                continue;
+                listing.push_str(&formatted_instruction);
+                listing.push('\n');
             }
             Err(e) => return Err(io::Error::from(e)),
         }
     }
-    let listing = listing.join("\n");
     Ok(listing)
 }
 
@@ -243,48 +243,32 @@ fn fun_name(binary: &str) -> Result<String, io::Error> {
 mod tests {
     use super::*;
     use std::fs;
+    const SINGLE_ASM: &str = "data/listing_0037_single_register_mov.asm";
+    const MANY_ASM: &str = "data/listing_0038_many_register_mov.asm";
 
-    #[test]
-    fn test_single_register() {
-        let asm_path = Path::new(SINGLE_ASM);
-
-        let asm_content = fs::read_to_string(asm_path).unwrap();
-        let stripped_asm_content: String = asm_content
+    fn read_and_strip_asm(asm_path: &Path) -> io::Result<String> {
+        let asm_content = fs::read_to_string(asm_path)?;
+        Ok(asm_content
             .lines()
             .filter(|line| {
                 !line.starts_with(';') && !line.is_empty() && !line.starts_with("bit 16")
             })
             .collect::<Vec<_>>()
-            .join("\n");
-
-        let normalized_stripped_asm_content = stripped_asm_content.replace("\r\n", "\n");
+            .join("\n"))
+    }
+    #[test]
+    fn test_single_register() {
+        let asm_path = Path::new(SINGLE_ASM);
+        let normalized_stripped_asm_content = read_and_strip_asm(asm_path).unwrap().replace("\r\n", "\n");
         let normalized_fun_name = fun_name(SINGLE).unwrap().replace("\r\n", "\n");
-
-        assert_eq!(
-            normalized_fun_name.trim(),
-            normalized_stripped_asm_content.trim()
-        );
+        assert_eq!(normalized_fun_name.trim(), normalized_stripped_asm_content.trim());
     }
 
     #[test]
     fn test_many_register() {
         let asm_path = Path::new(MANY_ASM);
-
-        let asm_content = fs::read_to_string(asm_path).unwrap();
-        let stripped_asm_content: String = asm_content
-            .lines()
-            .filter(|line| {
-                !line.starts_with(';') && !line.is_empty() && !line.starts_with("bit 16")
-            })
-            .collect::<Vec<_>>()
-            .join("\n");
-
-        let normalized_stripped_asm_content = stripped_asm_content.replace("\r\n", "\n");
+        let normalized_stripped_asm_content = read_and_strip_asm(asm_path).unwrap().replace("\r\n", "\n");
         let normalized_fun_name = fun_name(MANY).unwrap().replace("\r\n", "\n");
-
-        assert_eq!(
-            normalized_fun_name.trim(),
-            normalized_stripped_asm_content.trim()
-        );
+        assert_eq!(normalized_fun_name.trim(), normalized_stripped_asm_content.trim());
     }
 }
