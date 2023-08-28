@@ -1,4 +1,3 @@
-
 use std::fmt;
 
 use super::{bit::Bit, errors::X86InstructionError};
@@ -69,6 +68,59 @@ impl X86Register {
             (Bit(true), 0b110) => Ok(X86Register::SI),
             (Bit(true), 0b111) => Ok(X86Register::DI),
             (_, _) => Err(X86InstructionError::InvalidRegister),
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_from_w_and_field_w0() {
+        // Test for W bit false (8-bit registers)
+        for field in 0b000..=0b111 {
+            let w = Bit(false);
+            let register = X86Register::from_w_and_field(w, field).unwrap();
+
+            // Determine the expected register enum variant based on the field
+            let expected = match field {
+                0b000 => X86Register::AL,
+                0b001 => X86Register::CL,
+                0b010 => X86Register::DL,
+                0b011 => X86Register::BL,
+                0b100 => X86Register::AH,
+                0b101 => X86Register::CH,
+                0b110 => X86Register::DH,
+                0b111 => X86Register::BH,
+                _ => panic!("Invalid field value!"),
+            };
+
+            assert_eq!(register, expected);
+        }
+    }
+
+    #[test]
+    fn test_from_w_and_field_w1() {
+        // Test for W bit true (16-bit registers)
+        for field in 0b000..=0b111 {
+            let w = Bit(true);
+            let register = X86Register::from_w_and_field(w, field).unwrap();
+
+            // Determine the expected register enum variant based on the field
+            let expected = match field {
+                0b000 => X86Register::AX,
+                0b001 => X86Register::CX,
+                0b010 => X86Register::DX,
+                0b011 => X86Register::BX,
+                0b100 => X86Register::SP,
+                0b101 => X86Register::BP,
+                0b110 => X86Register::SI,
+                0b111 => X86Register::DI,
+                _ => panic!("Invalid field value!"),
+            };
+
+            assert_eq!(register, expected);
         }
     }
 }

@@ -24,3 +24,34 @@ impl fmt::Display for X86Opcode {
         write!(f, "{}", value)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_from_u8() {
+        assert_eq!(X86Opcode::from_u8(0b100010), X86Opcode::Mov);
+        assert_eq!(X86Opcode::from_u8(0b100011), X86Opcode::InvalidInstruction);
+    }
+
+    #[test]
+    fn test_fmt() {
+        assert_eq!(format!("{}", X86Opcode::Mov), "mov");
+        assert_eq!(
+            format!("{}", X86Opcode::InvalidInstruction),
+            "invalid instruction"
+        );
+    }
+
+    #[test]
+    fn test_opcode_from_u8() {
+        // Test known opcode 100010 in binary
+        let opcode = X86Opcode::from_u8(0b100010);
+        assert_eq!(opcode, X86Opcode::Mov);
+
+        // Test unknown opcode
+        let invalid_opcode = X86Opcode::from_u8(0b111111);
+        assert_eq!(invalid_opcode, X86Opcode::InvalidInstruction);
+    }
+}

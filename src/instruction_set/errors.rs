@@ -21,3 +21,20 @@ impl From<X86InstructionError> for io::Error {
         io::Error::new(io::ErrorKind::Other, error)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_fmt() {
+        assert_eq!(
+            format!("{}", X86InstructionError::InvalidInstruction),
+            "InvalidInstruction"
+        );
+        assert_eq!(
+            format!("{}", X86InstructionError::InvalidRegister),
+            "InvalidRegister"
+        );
+    }
+}
