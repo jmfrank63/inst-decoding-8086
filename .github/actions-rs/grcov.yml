@@ -6,6 +6,7 @@ llvm: true
 excl-line: "GRCOV_EXCL_LINE"
 excl-start: "GRCOV_EXCL_START"
 excl-stop: "GRCOV_EXCL_STOP"
+excl-br-line: '^\s*(assert(_eq|_ne)?!|#\[derive\()'
 filter: covered
 output-type: lcov
 output-path: ./lcov.info
