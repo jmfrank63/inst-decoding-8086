@@ -32,6 +32,18 @@ fn test_command_line_tool() {
 }
 
 #[test]
+fn test_command_line_tool_with_missing_filename() {
+    let mut cmd = Command::new("target/debug/decode");
+    let output = cmd.output().unwrap();
+
+    assert!(!output.status.success()); // Expecting the program to fail due to missing filename.
+    assert_eq!(output.status.code().unwrap(), 1); // Assuming that your program exits with code 1 for errors.
+
+    let stderr_str = String::from_utf8(output.stderr).unwrap();
+    assert!(stderr_str.contains("Input file name is required")); // Your error message in the closure.
+}
+
+#[test]
 fn test_command_line_tool_without_output_filename() {
     let mut input_file = NamedTempFile::new().unwrap();
     input_file.write_all(&[0x89, 0xD9]).unwrap();
@@ -71,7 +83,6 @@ fn test_command_line_tool_with_unwritable_file_name() {
     assert!(!output.status.success());
     let stderr_str = String::from_utf8(output.stderr).unwrap();
     assert!(stderr_str.contains("Permission denied"));
-    // Delete the file so that it doesn't interfere with other tests
     fs::remove_file(output_path).unwrap();
 }
 

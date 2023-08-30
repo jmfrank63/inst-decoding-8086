@@ -1,6 +1,6 @@
 use super::{bit::Bit, errors::X86InstructionError, opcodes::X86Opcode, registers::X86Register};
 
-#[derive(Debug, Clone, Copy)] // GRCOV_EXCL_LINE
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct X86Instruction {
     raw: u16,
 }
@@ -168,5 +168,28 @@ mod tests {
             }
         }
         assert_eq!(count, 8 * 8 * 2 * 2); // all registers with combined with each other 8 * 8 , 2 for d bit, 2 for w bit
+    }
+
+    #[test]
+    fn test_debug_trait() {
+        let inst = X86Instruction::new([0b10001011, 0b11111111]);
+        let debug_string = format!("{:?}", inst);
+        assert!(!debug_string.is_empty()); // Make sure it produces a non-empty string.
+    }
+
+    #[test]
+    fn test_copy_trait() {
+        let inst1 = X86Instruction::new([0b10001011, 0b11111111]);
+        let inst2 = inst1; // This would move `inst1` if it were not `Copy`
+        assert_eq!(inst1.raw, inst2.raw); // Ensure they are identical
+    }
+
+    #[test]
+    fn test_clone_trait() {
+        let inst1 = X86Instruction::new([0b10001011, 0b11111111]);
+        #[allow(clippy::clone_on_copy)]
+        let inst2 = inst1.clone();
+        assert_eq!(inst1, inst2); // Ensure they are identical
+        assert!(!std::ptr::eq(&inst1, &inst2)); // Ensure they are different objects
     }
 }

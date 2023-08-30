@@ -46,6 +46,21 @@ mod test {
     }
 
     #[test]
+    fn test_debug_trait() {
+        // Create instances
+        let mov = X86Opcode::Mov;
+        let invalid_instruction = X86Opcode::InvalidInstruction;
+
+        // Format instances using debug formatting
+        let mov_debug_string = format!("{:?}", mov);
+        let invalid_instruction_debug_string = format!("{:?}", invalid_instruction);
+
+        // Assertions
+        assert_eq!(mov_debug_string, "Mov"); // Compare against expected output
+        assert_eq!(invalid_instruction_debug_string, "InvalidInstruction"); // Compare against expected output
+    }
+
+    #[test]
     fn test_opcode_from_u8() {
         // Test known opcode 100010 in binary
         let opcode = X86Opcode::from_u8(0b100010);

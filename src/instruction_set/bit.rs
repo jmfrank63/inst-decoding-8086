@@ -120,6 +120,19 @@ mod tests {
     }
 
     #[test]
+    fn test_clone_trait() {
+        let original = Bit(true); // replace with the constructor or initialization method for your type
+        #[allow(clippy::clone_on_copy)]
+        let clone = original.clone();
+
+        // Check that the original and clone are equal in value
+        assert_eq!(original, clone);
+
+        // Check that they are different instances in memory
+        assert!(!std::ptr::eq(&original, &clone));
+    }
+
+    #[test]
     fn test_debug_format() {
         let true_bit = Bit(true);
         assert_eq!(format!("{:?}", true_bit), "Bit(true)");

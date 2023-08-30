@@ -83,9 +83,13 @@ mod test {
     #[test]
     fn test_from_w_and_field_w0() {
         // Test for W bit false (8-bit registers)
-        for field in 0b000..=0b111 {
+        for field in 0b000..=0b1000 {
             let w = Bit(false);
-            let register = X86Register::from_w_and_field(w, field).unwrap();
+            let register = if field > 0b111 {
+                X86Register::InvalidRegister
+            } else {
+                X86Register::from_w_and_field(w, field).unwrap()
+            };
 
             // Determine the expected register enum variant based on the field
             let expected = match field {
@@ -107,9 +111,13 @@ mod test {
     #[test]
     fn test_from_w_and_field_w1() {
         // Test for W bit true (16-bit registers)
-        for field in 0b000..=0b111 {
+        for field in 0b000..=0b1111 {
             let w = Bit(true);
-            let register = X86Register::from_w_and_field(w, field).unwrap();
+            let register = if field > 0b111 {
+                X86Register::InvalidRegister
+            } else {
+                X86Register::from_w_and_field(w, field).unwrap()
+            };
 
             // Determine the expected register enum variant based on the field
             let expected = match field {
@@ -121,11 +129,13 @@ mod test {
                 0b101 => X86Register::BP,
                 0b110 => X86Register::SI,
                 0b111 => X86Register::DI,
-                _ => panic!("Invalid field value!"), // GRCOV_EXCL_LINE
+                _ => X86Register::InvalidRegister,
             };
 
             assert_eq!(register, expected);
         }
+        let invalid_result = X86Register::from_w_and_field(Bit(true), 0b1000);
+        assert_eq!(invalid_result, Err(X86InstructionError::InvalidRegister));
     }
 
     #[test]
@@ -148,5 +158,18 @@ mod test {
         let register = X86Register::InvalidRegister;
         let display_string = format!("{}", register);
         assert_eq!(display_string, "invalid");
+    }
+
+    #[test]
+    fn test_debug_trait_for_register() {
+        let ax = X86Register::AX;
+        let bx = X86Register::BX;
+        let invalid_register = X86Register::InvalidRegister;
+        let ax_debug_string = format!("{:?}", ax);
+        let bx_debug_string = format!("{:?}", bx);
+        let invalid_register_debug_string = format!("{:?}", invalid_register);
+        assert_eq!(ax_debug_string, "AX");
+        assert_eq!(bx_debug_string, "BX");
+        assert_eq!(invalid_register_debug_string, "InvalidRegister");
     }
 }
