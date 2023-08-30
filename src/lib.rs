@@ -22,10 +22,12 @@ pub fn disassemble(file: &Path) -> Result<String> {
     }
     Ok(listing.trim().into())
 }
+
 #[cfg(test)]
 mod utils;
 #[cfg(test)]
 mod tests {
+
     use crate::utils::preprocess_listing;
 
     use super::*;
@@ -42,10 +44,7 @@ mod tests {
         let normalized_stripped_asm_content = preprocess_listing(&asm_content);
         let path = Path::new(SINGLE);
         let normalized_fun_name = disassemble(path).unwrap();
-        assert_eq!(
-            normalized_fun_name,
-            normalized_stripped_asm_content
-        );
+        assert_eq!(normalized_fun_name, normalized_stripped_asm_content);
     }
 
     #[test]
@@ -55,9 +54,6 @@ mod tests {
         let normalized_stripped_asm_content = preprocess_listing(&asm_content);
         let path = Path::new(MANY);
         let normalized_fun_name = disassemble(path).unwrap();
-        assert_eq!(
-            normalized_fun_name,
-            normalized_stripped_asm_content
-        );
+        assert_eq!(normalized_fun_name, normalized_stripped_asm_content);
     }
 }

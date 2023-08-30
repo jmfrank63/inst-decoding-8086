@@ -31,7 +31,14 @@ mod test {
         let custom_error = X86InstructionError::InvalidInstruction; // Replace with an actual error variant from your X86InstructionError enum
         let io_error: io::Error = custom_error.into();
         assert_eq!(io_error.kind(), io::ErrorKind::Other);
-        assert_eq!(io_error.get_ref().unwrap().downcast_ref::<X86InstructionError>().unwrap(), &X86InstructionError::InvalidInstruction);
+        assert_eq!(
+            io_error
+                .get_ref()
+                .unwrap()
+                .downcast_ref::<X86InstructionError>()
+                .unwrap(),
+            &X86InstructionError::InvalidInstruction
+        );
     }
 
     #[test]

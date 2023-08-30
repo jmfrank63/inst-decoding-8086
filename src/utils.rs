@@ -1,3 +1,4 @@
+#[cfg(test)]
 pub fn preprocess_listing(listing: &str) -> String {
     listing
         .lines()
@@ -6,9 +7,7 @@ pub fn preprocess_listing(listing: &str) -> String {
         .join("\n")
         .replace("\r\n", "\n")
 }
-
 #[cfg(test)]
-
 mod tests {
     use super::*;
 

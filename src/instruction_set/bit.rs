@@ -1,5 +1,5 @@
-use std::ops::{BitAnd, BitOr, BitXor, BitAndAssign, BitOrAssign, BitXorAssign, Not};
 use std::fmt;
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Bit(pub bool);
@@ -125,7 +125,7 @@ mod tests {
         let false_bool: bool = Bit(false).into();
         assert!(!false_bool);
     }
-    
+
     #[test]
     fn test_not() {
         let a = Bit(true);
