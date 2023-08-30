@@ -27,7 +27,8 @@ jobs:
 
     - name: Run Tests with Coverage
       run: |
-        export RUSTFLAGS="-Zinstrument-coverage"
+        export RUSTFLAGS="-Cinstrument-coverage"
+        export LLVM_PROFILE_FILE="inst-decoding-8086-%p-%m.profraw"
         cargo test
 
     - name: Generate coverage report
