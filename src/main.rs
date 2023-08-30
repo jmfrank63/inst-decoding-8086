@@ -33,10 +33,19 @@ fn get_output_filename(args: &[String], default_input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::ErrorKind;
+    use std::path::Path;
+
+    #[test]
+    fn test_disassemble_file_not_found() {
+        let non_existent_path = Path::new("some_non_existent_file");
+        let result = disassemble(non_existent_path);
+        assert_eq!(result.unwrap_err().kind(), ErrorKind::NotFound);
+    }
 
     #[test]
     fn test_get_output_filename() {
-        let args = vec!["inst-decoding-8086".to_string(), "input".to_string()];
+        let args = vec!["decode".to_string(), "input".to_string()];
         let default_input = "input";
         let expected = "input.asm";
         assert_eq!(get_output_filename(&args, default_input), expected);
@@ -45,7 +54,7 @@ mod tests {
     #[test]
     fn test_get_output_filename_with_output_arg() {
         let args = vec![
-            "inst-decoding-8086".to_string(),
+            "decode".to_string(),
             "input".to_string(),
             "output".to_string(),
         ];

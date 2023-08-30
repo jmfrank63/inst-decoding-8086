@@ -1,6 +1,6 @@
-use std::fs;
+#[cfg(test)]
 use std::io::Write;
-use std::process::Command;
+use std::{fs, process::Command};
 use tempfile::{Builder, NamedTempFile};
 
 use crate::utils::preprocess_listing;
@@ -17,20 +17,16 @@ fn test_command_line_tool() {
     let input_path = input_file.path().to_str().unwrap();
     let output_path = output_file.path().to_str().unwrap();
 
-    let mut cmd = Command::new("target/debug/inst-decoding-8086");
+    let mut cmd = Command::new("target/debug/decode");
     cmd.arg(input_path);
     cmd.arg(output_path);
 
     let output = cmd.output().unwrap();
-
     assert!(output.status.success());
-
     let expected_output = "bits 16\nmov cx, bx";
     let real_output = fs::read_to_string(output_path).unwrap();
-
     assert_eq!(expected_output, real_output);
 }
-
 #[test]
 fn test_command_line_tool_without_output_filename() {
     let mut input_file = NamedTempFile::new().unwrap();
@@ -39,19 +35,15 @@ fn test_command_line_tool_without_output_filename() {
     let input_path = input_file.path().to_str().unwrap();
     let output_path = format!("{}.asm", input_path);
 
-    let mut cmd = Command::new("target/debug/inst-decoding-8086");
+    let mut cmd = Command::new("target/debug/decode");
     cmd.arg(input_path);
 
     let output = cmd.output().unwrap();
-
     assert!(output.status.success());
-
     let expected_output = "bits 16\nmov cx, bx";
     let real_output = fs::read_to_string(output_path).unwrap();
-
     assert_eq!(expected_output, real_output);
 }
-
 #[test]
 fn test_functional_coverage() {
     for filename in [
@@ -68,16 +60,14 @@ fn test_functional_coverage() {
         let output_path = named_tempfile.path().to_str().unwrap();
         let expected_output_path = format!("tests/test_data/{}.asm", filename);
 
-        let mut cmd = Command::new("target/debug/inst-decoding-8086");
+        let mut cmd = Command::new("target/debug/decode");
         cmd.arg(input_path).arg(output_path);
 
         let output = cmd.output().unwrap();
         assert!(output.status.success());
-
         let expected_output = fs::read_to_string(&expected_output_path).unwrap();
         let normalised_expected_output = preprocess_listing(&expected_output);
         let real_output = fs::read_to_string(output_path).unwrap();
-
         assert_eq!(normalised_expected_output, real_output);
     }
 }

@@ -7,7 +7,7 @@ pub struct X86Instruction {
 
 impl X86Instruction {
     /// Create a new X86Instruction from a 4-byte array
-    pub fn new(buffer: [u8; 2]) -> Self {
+    pub(crate) fn new(buffer: [u8; 2]) -> Self {
         let value = u16::from_be_bytes(buffer);
         X86Instruction { raw: value }
     }
@@ -33,16 +33,16 @@ impl X86Instruction {
     }
 
     /// Get the 3-bit reg field
-    pub fn reg_field(&self) -> u8 {
+    fn reg_field(&self) -> u8 {
         ((self.raw & 0b00000000_00111000) >> 3) as u8
     }
 
     /// Get the 3-bit R/M field
-    pub fn rm_field(&self) -> u8 {
+    fn rm_field(&self) -> u8 {
         (self.raw & 0b00000000_00000111) as u8
     }
 
-    pub fn format_instruction(&self) -> Result<String, X86InstructionError> {
+    pub(crate) fn format_instruction(&self) -> Result<String, X86InstructionError> {
         let opcode = self.opcode();
 
         let op = match opcode {

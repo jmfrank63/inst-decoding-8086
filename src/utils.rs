@@ -1,4 +1,12 @@
-#[cfg(test)]
+/// Preprocesses a listing by removing comments and extra newlines.
+///
+/// # Examples
+/// ```
+/// use inst_decoding_8086::utils::preprocess_listing;
+/// let input = "; this is a comment";
+/// let expected = "";
+/// assert_eq!(preprocess_listing(input), expected);
+/// ```
 pub fn preprocess_listing(listing: &str) -> String {
     listing
         .lines()
