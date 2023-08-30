@@ -1,6 +1,9 @@
 #[cfg(test)]
 use std::io::Write;
-use std::{fs, process::Command};
+use std::{
+    fs::{self, File},
+    process::Command,
+};
 use tempfile::{Builder, NamedTempFile};
 
 use crate::utils::preprocess_listing;
@@ -48,13 +51,17 @@ fn test_command_line_tool_without_output_filename() {
 
 #[test]
 fn test_command_line_tool_with_unwritable_file_name() {
-    // Create a temporary input file with valid content
     let mut input_file = NamedTempFile::new().unwrap();
     input_file.write_all(&[0x89, 0xD9]).unwrap();
     let input_path = input_file.path().to_str().unwrap();
 
-    // Choose an unwritable output file location
-    let output_path = "/unwritable_output_file";
+    let output_file = NamedTempFile::new().unwrap();
+    let output_path = output_file.path().to_str().unwrap();
+    let file = File::create(output_path).unwrap();
+    let metadata = file.metadata().unwrap();
+    let mut permissions = metadata.permissions();
+    permissions.set_readonly(true);
+    file.set_permissions(permissions).unwrap();
 
     let mut cmd = Command::new("target/debug/decode");
     cmd.arg(input_path);
@@ -63,7 +70,9 @@ fn test_command_line_tool_with_unwritable_file_name() {
     let output = cmd.output().unwrap();
     assert!(!output.status.success());
     let stderr_str = String::from_utf8(output.stderr).unwrap();
-    assert!(stderr_str.contains("Read-only file system"));
+    assert!(stderr_str.contains("Permission denied"));
+    // Delete the file so that it doesn't interfere with other tests
+    fs::remove_file(output_path).unwrap();
 }
 
 #[test]
