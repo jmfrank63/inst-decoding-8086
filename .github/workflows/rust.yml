@@ -1,59 +1,41 @@
-name: Rust Test and Code Coverage
+name: CI
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-
-env:
-  CARGO_TERM_COLOR: always
+    branches:
+      - main
 
 jobs:
-  test:
-
+  test-rust:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: sudo apt-get install llvm-dev libclang-dev clang lcov
-
-    # Setup Rust toolchain
-    - name: Setup Rust
+    - name: Install Rust Nightly and LLVM Tools
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
-        override: true
+        toolchain: nightly
+        components: llvm-tools-preview
 
-    # Cache cargo dependencies
-    - name: Cache cargo registry
-      uses: actions/cache@v2
+    - name: Setup grcov
+      uses: SierraSoftworks/setup-grcov@v1
       with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        version: latest
 
-    # Run Tests
-    - name: Run tests
+    - name: Run Tests with Coverage
       run: |
-        export RUSTFLAGS="-Cinstrument-coverage"
-        export LLVM_PROFILE_FILE="inst-decoding-8086-%p-%m.profraw"
+        export RUSTFLAGS="-Zinstrument-coverage"
         cargo test
 
-    # Generate a coverage report
     - name: Generate coverage report
       run: |
-        cargo install grcov
-        export PATH="$PATH:./"
-        export CARGO_INCREMENTAL=0
-        export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
-        export RUSTDOCFLAGS="-Cpanic=abort"
-        grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing  --excl-line "GRCOV_EXCL_LINE" --excl-start "GRCOV_EXCL_START" --excl-stop "GRCOV_EXCL_STOP" -o ./target/debug/lcov.info
+        grcov . --binary-path target/debug/deps/ -s . -t lcov --ignore-not-existing --ignore '../**' --ignore '/*' -o ./lcov.info
 
-    # Optional: Upload the HTML coverage report somewhere, or upload to codecov.io
-    - name: Upload to codecov.io
-      uses: codecov/codecov-action@v2
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
       with:
-        token: ${{secrets.CODECOV_TOKEN}}  # if needed
-        files: ./target/debug/lcov.info
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./lcov.info
