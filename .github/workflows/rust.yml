@@ -6,39 +6,35 @@ on:
       - main
 
 jobs:
-  test-rust:
-    runs-on: ubuntu-latest
+    lint:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v1
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: nightly
+            override: true
+        - uses: actions-rs/cargo@v1
+          with:
+            command: test
+            args: --all-features --no-fail-fast
+          env:
+            CARGO_INCREMENTAL: '0'
+            RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+            RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+        - uses: actions-rs/grcov@v0.1
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+        - id: coverage
+          uses: actions-rs/grcov@v0.1
 
-    - name: Install Rust Nightly and LLVM Tools
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        components: llvm-tools-preview
+        - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v1
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            file: ./lcov.info
 
-    - name: Setup grcov
-      uses: SierraSoftworks/setup-grcov@v1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        version: latest
-
-    - name: Run Tests with Coverage
-      run: |
-        export RUSTFLAGS="-Cinstrument-coverage"
-        export LLVM_PROFILE_FILE="inst-decoding-8086-%p-%m.profraw"
-        cargo test
-
-    - name: Generate coverage report
-      run: |
-            export CARGO_INCREMENTAL=0
-            export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
-            export RUSTDOCFLAGS="-Cpanic=abort"
-            grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing  --ignore '../**' --ignore '/*' --excl-line "GRCOV_EXCL_LINE" --excl-start "GRCOV_EXCL_START" --excl-stop "GRCOV_EXCL_STOP" -o ./target/debug/lcov.info
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./lcov.info
+        - name: Coveralls upload
+          uses: coverallsapp/github-action@master
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            path-to-lcov: ${{ steps.coverage.outputs.report }}

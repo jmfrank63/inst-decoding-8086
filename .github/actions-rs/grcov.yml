@@ -1,0 +1,16 @@
+branch: true
+source: .
+binary-path: ./target/debug/
+ignore-not-existing: true
+llvm: true
+excl-br-lines: true
+excl-line: "GRCOV_EXCL_LINE"
+excl-start: "GRCOV_EXCL_START"
+excl-stop: "GRCOV_EXCL_STOP"
+filter: covered
+output-type: lcov
+output-path: ./lcov.info
+ignore:
+  - "/*"
+  - "C:/*"
+  - "../*"
