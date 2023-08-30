@@ -83,6 +83,13 @@ mod tests {
     }
 
     #[test]
+    fn test_disassemble_file_not_found() {
+        let non_existent_path = Path::new("some_non_existent_file");
+        let result = disassemble(non_existent_path);
+        assert_eq!(result.unwrap_err().kind(), ErrorKind::NotFound);
+    }
+
+    #[test]
     fn test_invalid_instruction() {
         // Create a temporary file and write some bytes representing an invalid instruction
         let mut temp_file = NamedTempFile::new().unwrap();

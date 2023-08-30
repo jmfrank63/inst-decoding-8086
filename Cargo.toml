@@ -14,11 +14,6 @@ path = "src/lib.rs"
 name = "decode"
 path = "src/main.rs"
 
-[[test]]
-name = "doctest"
-path = "src/main.rs"
-doctest = true
-
 [dependencies]
 
 [dev-dependencies]

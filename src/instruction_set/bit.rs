@@ -106,6 +106,28 @@ mod tests {
         assert_eq!(format!("{}", false_bit), "0");
     }
 
+    #[test]
+    fn test_copy_trait() {
+        let original = Bit(true);
+        let mut copy = original; // Copy occurs here
+
+        // Modify the original
+        copy = !copy;
+
+        // The copy should remain unchanged
+        assert_eq!(original, Bit(true));
+        assert_eq!(copy, Bit(false));
+    }
+
+    #[test]
+    fn test_debug_format() {
+        let true_bit = Bit(true);
+        assert_eq!(format!("{:?}", true_bit), "Bit(true)");
+
+        let false_bit = Bit(false);
+        assert_eq!(format!("{:?}", false_bit), "Bit(false)");
+    }
+
     // Test for From<bool> for Bit
     #[test]
     fn test_from_bool() {
@@ -167,6 +189,21 @@ mod tests {
     #[test]
     fn test_and_assign() {
         let mut a = Bit(true);
+        let b = Bit(true);
+        a &= b;
+        assert_eq!(a, Bit(true));
+
+        let mut a = Bit(true);
+        let b = Bit(false);
+        a &= b;
+        assert_eq!(a, Bit(false));
+
+        let mut a = Bit(false);
+        let b = Bit(true);
+        a &= b;
+        assert_eq!(a, Bit(false));
+
+        let mut a = Bit(false);
         let b = Bit(false);
         a &= b;
         assert_eq!(a, Bit(false));
@@ -175,16 +212,46 @@ mod tests {
     #[test]
     fn test_or_assign() {
         let mut a = Bit(true);
+        let b = Bit(true);
+        a |= b;
+        assert_eq!(a, Bit(true));
+
+        let mut a = Bit(true);
         let b = Bit(false);
         a |= b;
         assert_eq!(a, Bit(true));
+
+        let mut a = Bit(false);
+        let b = Bit(true);
+        a |= b;
+        assert_eq!(a, Bit(true));
+
+        let mut a = Bit(false);
+        let b = Bit(false);
+        a |= b;
+        assert_eq!(a, Bit(false));
     }
 
     #[test]
     fn test_xor_assign() {
         let mut a = Bit(true);
+        let b = Bit(true);
+        a ^= b;
+        assert_eq!(a, Bit(false));
+
+        let mut a = Bit(true);
         let b = Bit(false);
         a ^= b;
         assert_eq!(a, Bit(true));
+
+        let mut a = Bit(false);
+        let b = Bit(true);
+        a ^= b;
+        assert_eq!(a, Bit(true));
+
+        let mut a = Bit(false);
+        let b = Bit(false);
+        a ^= b;
+        assert_eq!(a, Bit(false));
     }
 }

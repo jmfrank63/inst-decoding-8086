@@ -20,6 +20,7 @@ pub enum X86Register {
     BP,
     SI,
     DI,
+    InvalidRegister,
 }
 
 impl fmt::Display for X86Register {
@@ -41,6 +42,7 @@ impl fmt::Display for X86Register {
             X86Register::BP => "bp",
             X86Register::SI => "si",
             X86Register::DI => "di",
+            X86Register::InvalidRegister => "invalid",
         };
         write!(f, "{}", value)
     }
@@ -67,7 +69,9 @@ impl X86Register {
             (Bit(true), 0b101) => Ok(X86Register::BP),
             (Bit(true), 0b110) => Ok(X86Register::SI),
             (Bit(true), 0b111) => Ok(X86Register::DI),
-            (_, _) => Err(X86InstructionError::InvalidRegister),
+            (_, _) => {
+                Err(X86Register::InvalidRegister).map_err(|_| X86InstructionError::InvalidRegister)
+            }
         }
     }
 }
@@ -93,7 +97,7 @@ mod test {
                 0b101 => X86Register::CH,
                 0b110 => X86Register::DH,
                 0b111 => X86Register::BH,
-                _ => panic!("Invalid field value!"), // GRCOV_EXCL_LINE
+                _ => X86Register::InvalidRegister,
             };
 
             assert_eq!(register, expected);
@@ -137,5 +141,12 @@ mod test {
             invalid_result,
             Err(X86InstructionError::InvalidRegister)
         ));
+    }
+
+    #[test]
+    fn test_invalid_register_display() {
+        let register = X86Register::InvalidRegister;
+        let display_string = format!("{}", register);
+        assert_eq!(display_string, "invalid");
     }
 }

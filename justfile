@@ -22,7 +22,7 @@ cover:
     export CARGO_INCREMENTAL=0
     export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
     export RUSTDOCFLAGS="-Cpanic=abort"
-    grcov . --binary-path ./target/debug/ -s . -t html --branch --llvm --ignore-not-existing --ignore "/*" --ignore "../**" --excl-line "GRCOV_EXCL_LINE" --excl-start "GRCOV_EXCL_START" --excl-stop "GRCOV_EXCL_STOP" --excl-br-line '^\s*(assert(_eq|_ne)?!|#\[derive\()' -o ./target/debug/coverage/
-    grcov . --binary-path ./target/debug/ -s . -t lcov --branch --llvm --ignore-not-existing --ignore "/*" --ignore "../**" --excl-line "GRCOV_EXCL_LINE" --excl-start "GRCOV_EXCL_START" --excl-stop "GRCOV_EXCL_STOP" --excl-br-line '^\s*(assert(_eq|_ne)?!|#\[derive\()' -o ./target/debug/lcov.info
+    grcov . --binary-path ./target/debug/ -s . -t html --branch --llvm --ignore-not-existing --ignore "/*" --ignore "../**" --excl-line '(//!|///)' --excl-br-line '^\s*(assert(_eq|_ne)?!|#\[derive\()' -o ./target/debug/coverage/
+    grcov . --binary-path ./target/debug/ -s . -t lcov --branch --llvm --ignore-not-existing --ignore "/*" --ignore "../**" --excl-line '(//!|///)' --excl-br-line '^\s*(assert(_eq|_ne)?!|#\[derive\()' -o ./target/debug/lcov.info
     genhtml -o ./target/debug/lcov --show-details --highlight --ignore-errors source  --ignore-errors unmapped,unmapped --legend ./target/debug/lcov.info
     rm -rf *.profraw
