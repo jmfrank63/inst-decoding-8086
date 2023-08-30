@@ -1,13 +1,14 @@
 use std::fmt;
 
+#[repr(u8)]
 #[derive(Debug, PartialEq, Eq)]
-pub enum X86Opcode {
-    Mov, // 100010 in binary
+pub(crate) enum X86Opcode {
+    Mov = 0b100010,
     InvalidInstruction,
 }
 
 impl X86Opcode {
-    pub fn from_u8(value: u8) -> Self {
+    pub(crate) fn from_u8(value: u8) -> Self {
         match value {
             0b100010 => X86Opcode::Mov,
             _ => X86Opcode::InvalidInstruction,

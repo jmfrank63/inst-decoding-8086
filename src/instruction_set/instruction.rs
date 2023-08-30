@@ -1,6 +1,6 @@
 use super::{bit::Bit, errors::X86InstructionError, opcodes::X86Opcode, registers::X86Register};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy)] // GRCOV_EXCL_LINE
 pub struct X86Instruction {
     raw: u16,
 }
@@ -118,9 +118,17 @@ mod tests {
     }
 
     #[test]
-    fn test_instruction_mov_ax_ax_reverse() {
-        let inst = X86Instruction::new([0b10001011, 0b11000000]);
-        assert_eq!(inst.format_instruction().unwrap(), "mov ax, ax");
+    fn test_format_instruction_invalid_mod_field() {
+        // Construct an X86Instruction with a mod_field other than 0b11
+        let src = 0b000;
+        let dest = 0b000;
+        let mod_bits = 0b01;
+        let opcode = 0b100010;
+        let first_byte = opcode << 2;
+        let second_byte = (mod_bits << 6) | (src << 3) | dest;
+        let instruction = X86Instruction::new([first_byte, second_byte]);
+        let result = instruction.format_instruction();
+        assert_eq!(result, Err(X86InstructionError::InvalidInstruction));
     }
 
     #[test]

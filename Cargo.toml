@@ -2,7 +2,17 @@
 name = "inst-decoding-8086"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "A library for decoding 8086 instructions"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[dev-dependencies]
+tempfile = "3.2.0"
+
+[profile.dev]
+lto = false
+codegen-units = 1
+debug = true

@@ -93,7 +93,7 @@ mod test {
                 0b101 => X86Register::CH,
                 0b110 => X86Register::DH,
                 0b111 => X86Register::BH,
-                _ => panic!("Invalid field value!"),
+                _ => panic!("Invalid field value!"), // GRCOV_EXCL_LINE
             };
 
             assert_eq!(register, expected);
@@ -117,10 +117,25 @@ mod test {
                 0b101 => X86Register::BP,
                 0b110 => X86Register::SI,
                 0b111 => X86Register::DI,
-                _ => panic!("Invalid field value!"),
+                _ => panic!("Invalid field value!"), // GRCOV_EXCL_LINE
             };
 
             assert_eq!(register, expected);
         }
+    }
+
+    #[test]
+    fn test_invalid_register() {
+        let invalid_result = X86Register::from_w_and_field(Bit(false), 0b10101); // value not covered
+        assert!(matches!(
+            invalid_result,
+            Err(X86InstructionError::InvalidRegister)
+        ));
+
+        let invalid_result = X86Register::from_w_and_field(Bit(true), 0b11000); // value not covered
+        assert!(matches!(
+            invalid_result,
+            Err(X86InstructionError::InvalidRegister)
+        ));
     }
 }

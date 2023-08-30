@@ -86,6 +86,46 @@ impl BitXorAssign for Bit {
 mod tests {
     use super::Bit;
 
+    // Test for fmt::Binary
+    #[test]
+    fn test_binary_format() {
+        let true_bit = Bit(true);
+        assert_eq!(format!("{:b}", true_bit), "1");
+
+        let false_bit = Bit(false);
+        assert_eq!(format!("{:b}", false_bit), "0");
+    }
+
+    // Test for fmt::Display
+    #[test]
+    fn test_display_format() {
+        let true_bit = Bit(true);
+        assert_eq!(format!("{}", true_bit), "1");
+
+        let false_bit = Bit(false);
+        assert_eq!(format!("{}", false_bit), "0");
+    }
+
+    // Test for From<bool> for Bit
+    #[test]
+    fn test_from_bool() {
+        let true_bit: Bit = true.into();
+        assert_eq!(true_bit, Bit(true));
+
+        let false_bit: Bit = false.into();
+        assert_eq!(false_bit, Bit(false));
+    }
+
+    // Test for From<Bit> for bool
+    #[test]
+    fn test_from_bit() {
+        let true_bool: bool = Bit(true).into();
+        assert!(true_bool);
+
+        let false_bool: bool = Bit(false).into();
+        assert!(!false_bool);
+    }
+    
     #[test]
     fn test_not() {
         let a = Bit(true);
@@ -148,4 +188,3 @@ mod tests {
         assert_eq!(a, Bit(true));
     }
 }
-
