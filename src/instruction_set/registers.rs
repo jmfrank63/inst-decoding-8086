@@ -2,7 +2,7 @@ use std::fmt;
 
 use super::{bit::Bit, errors::X86InstructionError};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum X86Register {
     AL,
     CL,

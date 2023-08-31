@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt;
 use std::io;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum X86InstructionError {
     InvalidInstruction,
     InvalidRegister,
@@ -50,6 +50,31 @@ mod test {
         assert_eq!(
             format!("{}", X86InstructionError::InvalidRegister),
             "InvalidRegister"
+        );
+    }
+
+    #[test]
+    fn test_debug_trait() {
+        let err = X86InstructionError::InvalidInstruction;
+        assert_eq!(format!("{:?}", err), "InvalidInstruction");
+
+        let err = X86InstructionError::InvalidRegister;
+        assert_eq!(format!("{:?}", err), "InvalidRegister");
+    }
+
+    #[test]
+    fn test_partial_eq_trait() {
+        assert_eq!(
+            X86InstructionError::InvalidInstruction,
+            X86InstructionError::InvalidInstruction
+        );
+        assert_eq!(
+            X86InstructionError::InvalidRegister,
+            X86InstructionError::InvalidRegister
+        );
+        assert_ne!(
+            X86InstructionError::InvalidInstruction,
+            X86InstructionError::InvalidRegister
         );
     }
 }
