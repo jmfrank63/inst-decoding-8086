@@ -77,4 +77,24 @@ mod test {
             X86InstructionError::InvalidRegister
         );
     }
+
+    #[test]
+    fn test_from_trait_implementation() {
+        let x86_error = X86InstructionError::InvalidInstruction;
+        let io_error = io::Error::from(x86_error);
+        assert_eq!(io_error.kind(), io::ErrorKind::Other);
+        let inner = io_error.get_ref().unwrap();
+        let inner_downcasted = inner.downcast_ref::<X86InstructionError>().unwrap();
+        assert_eq!(inner_downcasted, &X86InstructionError::InvalidInstruction);
+    }
+
+    #[test]
+    fn test_into_trait_implementation() {
+        let x86_error = X86InstructionError::InvalidRegister;
+        let io_error: io::Error = x86_error.into();
+        assert_eq!(io_error.kind(), io::ErrorKind::Other);
+        let inner = io_error.get_ref().unwrap();
+        let inner_downcasted = inner.downcast_ref::<X86InstructionError>().unwrap();
+        assert_eq!(inner_downcasted, &X86InstructionError::InvalidRegister);
+    }
 }
